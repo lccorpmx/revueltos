@@ -16,7 +16,7 @@ export function Hero() {
         <Wave variant="a" flip className="-mt-px h-8 sm:h-10 lg:h-12" />
       </div>
 
-      <div className="container-page relative grid items-center gap-6 pt-[calc(var(--header-h)+3.5rem)] pb-20 sm:pb-24 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] lg:gap-2 lg:pt-[calc(var(--header-h)+4rem)] lg:pb-28">
+      <div className="container-page relative grid items-center gap-16 pt-[calc(var(--header-h)+4.5rem)] pb-28 sm:pb-32 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] lg:gap-6 lg:pt-[calc(var(--header-h)+5.5rem)] lg:pb-40">
         <div className="relative z-10 max-w-2xl">
           <Sparks className="absolute -top-9 -left-3 size-11 -scale-x-100 sm:-left-8" />
           <h1 id="hero-title" className="display-heavy text-[clamp(2.6rem,5.4vw,4.6rem)] text-ink">
@@ -28,10 +28,10 @@ export function Hero() {
             </span>
           </h1>
           <Shine className="absolute top-[42%] -left-6 hidden size-10 -rotate-12 sm:block" />
-          <p className="mt-7 max-w-md animate-rise text-lg leading-relaxed text-ink-soft [animation-delay:260ms] sm:text-xl">
+          <p className="mt-10 max-w-md animate-rise text-lg leading-relaxed text-ink-soft [animation-delay:260ms] sm:text-xl">
             Huevos, sándwiches y más, con ingredientes frescos y mucho sabor mexicano.
           </p>
-          <div className="mt-8 flex animate-rise flex-wrap items-center gap-3 [animation-delay:340ms]">
+          <div className="mt-10 flex animate-rise flex-wrap items-center gap-4 [animation-delay:340ms]">
             <Button asChild variant="ink" size="pill">
               <a {...linkProps(siteConfig.links.order)}>
                 <ScooterIcon className="text-sun" />
@@ -60,14 +60,14 @@ function HeroVisual() {
   return (
     <div className="relative mx-auto w-full max-w-[560px] lg:max-w-none">
       <div className="relative aspect-[10/9.4]">
-        <div className="absolute top-[9%] right-[-14%] w-[60%] rotate-[9deg] sm:right-[-6%] lg:right-[-13%]">
+        <div className="absolute top-[9%] right-[-14%] w-[60%] rotate-[9deg] sm:right-[-6%] lg:right-[-15%]">
           <HeroSandwich className="w-full animate-pop-soft" />
         </div>
 
         <Slashes className="absolute top-[-2%] left-[42%] w-[12%] rotate-6" />
         <FriedEgg className="absolute bottom-[30%] left-[2%] w-[11%] -rotate-12 animate-float lg:left-[-12%]" />
 
-        <AnimatedScene className="absolute bottom-[-6%] left-[-2%] w-[94%] lg:left-[-16%] lg:w-[104%]">
+        <AnimatedScene className="absolute bottom-[-6%] left-[-4%] w-[94%] lg:left-[-21%] lg:w-[104%]">
           <HeroScene className="h-auto w-full" />
         </AnimatedScene>
 

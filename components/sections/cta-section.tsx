@@ -12,7 +12,7 @@ export function CtaSection() {
     <section id="ubicacion" aria-labelledby="cta-title" className="relative bg-cream">
       <Wave variant="c" className="text-sun" />
       <div className="relative bg-sun">
-        <div className="container-page grid items-center gap-6 pt-6 pb-14 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.6fr)_minmax(0,0.75fr)] lg:gap-4 lg:pt-4 lg:pb-16">
+        <div className="container-page grid items-center gap-12 pt-12 pb-20 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.6fr)_minmax(0,0.75fr)] lg:gap-6 lg:pt-10 lg:pb-24">
           <Reveal className="relative order-2 mx-auto w-[min(15rem,62%)] lg:order-none lg:w-full lg:max-w-[16rem]">
             <Shine className="absolute top-[38%] -left-4 size-10 rotate-180" />
             <AnimatedScene>
@@ -24,7 +24,7 @@ export function CtaSection() {
             <p className="font-display text-sm font-extrabold tracking-[0.14em] text-ink uppercase sm:text-base">
               Visítanos u ordena en línea
             </p>
-            <h2 id="cta-title" className="display-heavy mt-3 text-[clamp(2.2rem,5vw,3.9rem)] text-ink">
+            <h2 id="cta-title" className="display-heavy mt-5 text-[clamp(2.2rem,5vw,3.9rem)] text-ink">
               Tu desayuno
               <br />
               te está{" "}
@@ -33,7 +33,7 @@ export function CtaSection() {
                 <Underline className="absolute -bottom-[0.3em] left-0 h-[0.3em] w-full" />
               </span>
             </h2>
-            <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
               <Button asChild variant="ink" size="pill">
                 <a {...linkProps(siteConfig.links.order)}>
                   <ScooterIcon className="text-sun" />

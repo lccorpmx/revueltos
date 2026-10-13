@@ -48,6 +48,12 @@ export function TikTokIcon(props: Props) {
   );
 }
 
+export const SOCIAL_ICONS = {
+  Instagram: InstagramIcon,
+  Facebook: FacebookIcon,
+  TikTok: TikTokIcon,
+} as const;
+
 /** Map pin with an orange body and a white dot (mockup style). */
 export function PinIcon(props: Props) {
   return (

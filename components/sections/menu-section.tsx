@@ -10,7 +10,7 @@ import { linkProps, siteConfig } from "@/lib/site";
 
 export function MenuSection() {
   return (
-    <section id="menu" aria-labelledby="menu-title" className="relative overflow-hidden bg-cream pt-12 pb-20 sm:pt-16 sm:pb-24">
+    <section id="menu" aria-labelledby="menu-title" className="relative overflow-hidden bg-cream pt-20 pb-28 sm:pt-24 sm:pb-36">
       <FriedEggDoodle className="absolute top-2 left-[3%] w-16 -rotate-12 animate-float sm:w-24" />
       <FriedEggDoodle className="absolute top-16 right-[4%] hidden w-16 rotate-12 animate-float [animation-delay:1.2s] sm:block" />
       <FriedEggDoodle className="absolute right-[12%] bottom-6 w-14 rotate-[30deg] animate-float [animation-delay:2.1s]" />
@@ -25,10 +25,10 @@ export function MenuSection() {
             Nuestro menú
             <Sparks className="size-8 shrink-0 sm:size-10" />
           </h2>
-          <p className="mt-2 text-lg text-ink-soft">Desayunos que siempre caen bien.</p>
+          <p className="mt-4 text-lg text-ink-soft">Desayunos que siempre caen bien.</p>
         </Reveal>
 
-        <ul className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 xl:grid-cols-6 xl:gap-4">
+        <ul className="mt-14 grid grid-cols-2 gap-4 sm:mt-16 sm:gap-6 md:grid-cols-3 xl:grid-cols-6 xl:gap-5">
           {menu.map((item, i) => (
             <li key={item.slug} className="h-full">
               <Reveal delay={i * 70} className="h-full">
@@ -38,7 +38,7 @@ export function MenuSection() {
           ))}
         </ul>
 
-        <Reveal className="mt-10 text-center">
+        <Reveal className="mt-14 text-center sm:mt-16">
           <Button asChild variant="sun" size="pill">
             <a {...linkProps(siteConfig.links.order)}>
               Ver menú completo
@@ -60,7 +60,7 @@ function MenuCard({ item }: { item: MenuItem }) {
           {item.tag}
         </span>
       )}
-      <div className="relative mx-auto mt-3 aspect-[408/330] w-[94%]">
+      <div className="relative mx-auto mt-4 aspect-[408/330] w-[94%]">
         <Image
           src={item.image}
           alt=""
@@ -69,13 +69,13 @@ function MenuCard({ item }: { item: MenuItem }) {
           className="object-contain transition-transform duration-500 ease-(--ease-squish) group-hover:scale-[1.07] group-hover:-rotate-3"
         />
       </div>
-      <CardHeader className="flex-1 content-start gap-1.5 px-3 pt-2 sm:px-4">
+      <CardHeader className="flex-1 content-start gap-2 px-4 pt-3 sm:px-5">
         <CardTitle className="font-display text-[1.12rem] leading-tight font-extrabold text-ink sm:text-[1.2rem]">
           {item.name}
         </CardTitle>
         <CardDescription className="text-[0.85rem] leading-snug text-ink-soft">{item.description}</CardDescription>
       </CardHeader>
-      <CardFooter className="justify-center border-t-0 bg-transparent pt-3 pb-5">
+      <CardFooter className="justify-center border-t-0 bg-transparent pt-4 pb-6">
         <Badge className="h-8 rounded-full bg-tangerine px-4 font-display text-[1.05rem] font-extrabold text-ink tabular-nums">
           {price}
         </Badge>

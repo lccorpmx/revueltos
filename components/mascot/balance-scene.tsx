@@ -1,21 +1,25 @@
 import { EASE, keyframes, motionSafe, o, r, step, t, tr, type Keyframe } from "@/lib/timeline";
 import {
+  Arm,
   Body,
   Cap,
   Cheeks,
   EggProp,
   Eyes,
+  EyesWink,
+  FaceFrame,
   GroundShadow,
-  Hand,
   Heart,
-  INK,
-  Limb,
+  Legs,
   MascotDefs,
   MouthO,
   MouthOpen,
   MouthSmile,
+  pivot,
+  pivotAt,
   SweatDrop,
 } from "./parts";
+import { MASCOT } from "./rig";
 
 /**
  * CTA scene: the mascot struts along balancing an egg on its cap, winking.
@@ -147,7 +151,7 @@ const CSS =
       ".scene-balance .bl-heart-2{animation-delay:1.6s}",
   );
 
-const pivot = { transformBox: "view-box", transformOrigin: "0 0" } as const;
+const { shoulderL: SL, shoulderR: SR, capTop } = MASCOT.anchors;
 
 export function BalanceScene({ className }: { className?: string }) {
   return (
@@ -156,60 +160,42 @@ export function BalanceScene({ className }: { className?: string }) {
         {CSS}
       </style>
       <svg
-        viewBox="-30 -40 270 290"
+        viewBox="-36 -30 290 280"
         className={`scene-balance overflow-visible ${className ?? ""}`}
         role="img"
         aria-label="Huevito con gorra que camina guiñando el ojo mientras equilibra un huevo sobre su gorra."
       >
         <MascotDefs id="bl" />
         <GroundShadow />
-        <g className="bl-body" style={{ transformBox: "view-box", transformOrigin: "100px 230px" }}>
-          <g transform="translate(86 196)">
-            <g className="bl-leg-l" style={pivot}>
-              <Limb d="M0 0L-4 30" />
-              <ellipse cx="-9" cy="33" rx="11.5" ry="6.6" fill={INK} />
-            </g>
-          </g>
-          <g transform="translate(114 196)">
-            <g className="bl-leg-r" style={pivot}>
-              <Limb d="M0 0L4 30" />
-              <ellipse cx="9" cy="33" rx="11.5" ry="6.6" fill={INK} />
-            </g>
-          </g>
-          <Body id="bl" />
-          <g transform="translate(35 142)">
+        <g className="bl-body" style={pivotAt(98, 232)}>
+          <Legs leftClassName="bl-leg-l" rightClassName="bl-leg-r" />
+          <Body />
+          <g transform={`translate(${SL[0]} ${SL[1]})`}>
             <g className="bl-arm-l" style={pivot}>
-              <Limb d="M0 0Q-16 -4 -28 -16" />
-              <Hand x={-30} y={-19} flip />
+              <Arm via={[-16, -4]} to={[-27, -16]} hand="open" flip />
             </g>
           </g>
-          <g transform="translate(165 142)">
+          <g transform={`translate(${SR[0]} ${SR[1]})`}>
             <g className="bl-arm-r" style={pivot}>
-              <Limb d="M0 0Q16 -4 28 -16" />
-              <Hand x={30} y={-19} />
+              <Arm via={[16, -4]} to={[27, -16]} hand="open" />
             </g>
           </g>
-          <Cheeks />
-          {/* wink: closed left eye + open right eye */}
-          <g className="bl-wink">
-            <path d="M76 130Q84 122 92 130" fill="none" stroke={INK} strokeWidth="4.2" strokeLinecap="round" />
-            <g className="m-blink">
-              <ellipse cx="117" cy="128" rx="7" ry="9.2" fill={INK} />
-              <circle cx="119.5" cy="124.2" r="2.6" fill="#fff" />
+          <FaceFrame>
+            <Cheeks />
+            <EyesWink className="bl-wink" blinkClassName="m-blink" />
+            <g className="bl-eyes" opacity={0}>
+              <Eyes wide />
             </g>
-          </g>
-          <g className="bl-eyes" opacity={0}>
-            <Eyes wide />
-          </g>
-          <MouthSmile className="bl-smile" />
-          <MouthO className="bl-o" opacity={0} />
-          <MouthOpen className="bl-open" opacity={0} />
-          <g transform="translate(152 102)">
+            <MouthSmile className="bl-smile" />
+            <MouthO className="bl-o" opacity={0} />
+            <MouthOpen className="bl-open" opacity={0} />
+          </FaceFrame>
+          <g transform="translate(164 98)">
             <SweatDrop className="bl-sweat" opacity={0} />
           </g>
-          <Cap id="bl" />
+          <Cap />
           {/* the egg balanced on top of the cap; pivots on its bottom tip */}
-          <g transform="translate(95 27)">
+          <g transform={`translate(${capTop[0] - 1} ${capTop[1] + 1})`}>
             <g className="bl-egg" style={pivot}>
               <g transform="translate(0 -14)">
                 <EggProp id="bl" />
@@ -217,10 +203,10 @@ export function BalanceScene({ className }: { className?: string }) {
             </g>
           </g>
         </g>
-        <g transform="translate(170 40)">
+        <g transform="translate(186 50)">
           <Heart className="bl-heart" size={0.9} />
         </g>
-        <g transform="translate(196 74)">
+        <g transform="translate(212 84)">
           <Heart className="bl-heart bl-heart-2" size={0.6} fill="#ffcf2e" />
         </g>
       </svg>

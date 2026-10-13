@@ -3,7 +3,7 @@
 import { cn } from "cn";
 import { ArrowRight, Menu } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ScooterIcon } from "@/components/brand/icons";
+import { SOCIAL_ICONS, ScooterIcon } from "@/components/brand/icons";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -129,6 +129,24 @@ function MobileMenu({ active }: { active: SectionId }) {
           <Button asChild variant="paper" size="pill">
             <a {...linkProps(siteConfig.links.maps)}>Encuentra nuestra ubicación</a>
           </Button>
+          <ul className="mt-2 flex items-center justify-center gap-2" aria-label="Redes sociales">
+            {siteConfig.socials.map(({ network, href }) => {
+              const Icon = SOCIAL_ICONS[network];
+              return (
+                <li key={network}>
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Revueltos en ${network}`}
+                    className="grid size-12 place-items-center rounded-full text-ink transition-colors hover:bg-butter"
+                  >
+                    <Icon className="size-6" />
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </SheetContent>
     </Sheet>

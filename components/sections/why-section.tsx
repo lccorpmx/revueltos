@@ -16,12 +16,12 @@ const SIGN = ["DESAYUNOS", "QUE HACEN", "LOS DÍAS", "MÁS CHIDOS"];
 
 export function WhySection() {
   return (
-    <section aria-labelledby="why-title" className="relative overflow-hidden bg-cream py-16 sm:py-24">
+    <section aria-labelledby="why-title" className="relative overflow-hidden bg-cream py-24 sm:py-32">
       {/* soft butter blobs like the mockup background */}
       <div aria-hidden="true" className="absolute -top-24 -left-24 size-[28rem] rounded-full bg-butter/70 blur-2xl" />
       <div aria-hidden="true" className="absolute -right-32 bottom-0 size-[30rem] rounded-full bg-butter blur-2xl" />
 
-      <div className="container-page relative grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="container-page relative grid items-center gap-16 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-12 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div>
           <Reveal className="flex flex-wrap items-end gap-x-6 gap-y-3">
             <h2 id="why-title" className="display-heavy relative -rotate-3 text-[clamp(2.3rem,4.8vw,3.6rem)] text-ink">
@@ -38,14 +38,14 @@ export function WhySection() {
             </p>
           </Reveal>
 
-          <div className="relative mt-12 rounded-[2.5rem] bg-butter-soft/80 px-4 py-8 shadow-[inset_0_0_0_2px_rgb(253_240_203)] sm:px-8">
-            <ul className="grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-4">
+          <div className="relative mt-16 rounded-[2.5rem] bg-butter-soft/80 px-5 py-12 shadow-[inset_0_0_0_2px_rgb(253_240_203)] sm:px-10 sm:py-14">
+            <ul className="grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-4 lg:gap-x-8">
               {FEATURES.map(({ title, text, Icon }, i) => (
                 <li key={title}>
                   <Reveal delay={i * 90} className="group flex flex-col items-center text-center">
                     <Icon className="h-20 w-auto transition-transform duration-300 ease-(--ease-squish) group-hover:-translate-y-1 group-hover:-rotate-6 sm:h-24" />
-                    <h3 className="mt-3 font-display text-[1.08rem] leading-tight font-extrabold text-ink sm:text-xl">{title}</h3>
-                    <p className="mt-1 max-w-[14rem] text-[0.95rem] leading-snug text-ink-soft">{text}</p>
+                    <h3 className="mt-5 font-display text-[1.08rem] leading-tight font-extrabold text-ink sm:text-xl">{title}</h3>
+                    <p className="mt-2 max-w-[14rem] text-[0.95rem] leading-relaxed text-ink-soft">{text}</p>
                   </Reveal>
                 </li>
               ))}

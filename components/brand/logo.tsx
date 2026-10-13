@@ -1,27 +1,11 @@
 import { cn } from "cn";
-import { Body, Cap, Cheeks, Eyes, Hand, Legs, Limb, MascotDefs, MouthSmile } from "@/components/mascot/parts";
+import { MascotPose } from "@/components/mascot/parts";
 
-/** Full-body mascot used as the brand mark (header, footer, favicon-like). */
+/** The mascot exactly as in the reference art (logo, wrapper print). */
 export function MascotMark({ className, id = "mark" }: { className?: string; id?: string }) {
   return (
-    <svg viewBox="-6 12 216 230" className={className} aria-hidden="true">
-      <MascotDefs id={id} />
-      <Legs />
-      <Body id={id} />
-      <g transform="translate(35 142)">
-        <Limb d="M0 0Q-12 12 -16 26" />
-        <Hand x={-17} y={29} flip />
-      </g>
-      <Cheeks />
-      <Eyes blinkClassName="m-blink" />
-      <MouthSmile />
-      <Cap id={id} />
-      <g transform="translate(165 142)">
-        <g className="origin-[0_0] [transform-box:view-box] group-hover:animate-[logo-wave_0.9s_ease-in-out]">
-          <Limb d="M0 0Q14 -12 16 -30" />
-          <Hand x={17} y={-34} />
-        </g>
-      </g>
+    <svg viewBox="-8 30 226 212" className={className} aria-hidden="true">
+      <MascotPose id={id} waveClassName="group-hover:animate-[logo-wave_0.9s_ease-in-out]" />
     </svg>
   );
 }

@@ -14,9 +14,9 @@ npm run start
 ```
 app/                      layout (fuentes, metadata), página, estilos globales y favicon
 components/
-  sections/               hero, menú, "capa por capa", por qué, historia, CTA
+  sections/               hero, menú, "capa por capa", por qué, historia, redes, CTA
   site/                   header (scroll-spy + menú móvil con Sheet) y footer
-  mascot/                 piezas SVG de la mascota y sus escenas animadas
+  mascot/                 rig de la mascota (rig.ts), piezas y escenas animadas
   hero/hero-sandwich.tsx  salsa + ajonjolí al cargar
   decor/                  olas, subrayados, huevos estrellados, íconos ilustrados
   brand/                  logo e íconos (moto, redes, pin)
@@ -28,6 +28,13 @@ lib/
   timeline.ts             helpers para coreografías CSS escritas en segundos
   sandwich-data.ts        capas, trayectoria de la salsa y semillas (generado)
 ```
+
+## Mascota
+
+El personaje sale directo del arte de referencia: el cuerpo y la gorra son capas recortadas de la
+ilustración (`public/images/mascot/`), y la cara, brazos y piernas son vectores trazados de la misma
+imagen (`components/mascot/rig.ts`) para poder animarlos sin cambiar el estilo. La pose original
+(mano en la cintura y saludando) está en `MascotPose` y es la que usa el logo.
 
 ## Animaciones
 
@@ -48,7 +55,8 @@ lib/
 
 ## Pendientes antes de publicar
 
-- `lib/site.ts`: link real de pedidos (`links.order`), ficha de Google Maps y redes sociales.
+- `lib/site.ts`: link real de pedidos (`links.order`), ficha de Google Maps y usuarios/URLs de redes
+  sociales (`socials`).
 - `public/images/menu/*` y `public/images/historia/*` son recortes del mockup en baja resolución:
   reemplázalos por fotos reales con el mismo nombre de archivo.
 - `public/images/sandwich/*` y `lib/sandwich-data.ts` salen de la foto del sándwich desglosado; si cambia

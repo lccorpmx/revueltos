@@ -96,7 +96,6 @@ function BuilderLayout({
     setLanded((current) => (current === next ? current : next));
   });
   const done = landed === INGREDIENTS.length;
-  const current = INGREDIENTS[Math.min(landed, INGREDIENTS.length - 1)];
 
   return (
     <section
@@ -116,12 +115,12 @@ function BuilderLayout({
             <h2 id="builder-title" className="display-heavy mt-2 text-[clamp(2rem,3.9vw,3.25rem)] text-ink">
               Así se arma un <span className="text-orange-deep">Ahuevo Toast</span>
             </h2>
-            <p className="mt-3 hidden max-w-md text-lg leading-snug text-ink-soft sm:block">
+            <p className="mt-4 hidden max-w-md text-lg leading-relaxed text-ink-soft sm:block">
               Baja despacito y míralo armarse: cada ingrediente cae justo en su lugar, como en nuestra cocina.
             </p>
 
             {/* desktop: full checklist */}
-            <ol className="sr-only gap-1.5 lg:not-sr-only lg:mt-5 lg:grid" aria-label="Ingredientes">
+            <ol className="sr-only gap-2 lg:not-sr-only lg:mt-8 lg:grid" aria-label="Ingredientes">
               {INGREDIENTS.map((item, i) => {
                 const isDone = i < landed;
                 const isCurrent = i === landed;
@@ -160,25 +159,9 @@ function BuilderLayout({
               })}
             </ol>
 
-            {/* mobile: compact progress */}
-            <div className="mt-3 lg:hidden" aria-hidden="true">
-              <div className="flex items-baseline justify-between gap-3 font-display font-extrabold text-ink">
-                <span>{done ? "¡Listo para morder!" : current.label}</span>
-                <span className="text-sm text-muted-foreground">
-                  {Math.min(landed + (done ? 0 : 1), INGREDIENTS.length)}/{INGREDIENTS.length}
-                </span>
-              </div>
-              <div className="mt-2 h-2.5 overflow-hidden rounded-full border-2 border-ink bg-white">
-                <div
-                  className="h-full rounded-full bg-orange transition-[width] duration-300"
-                  style={{ width: `${(landed / INGREDIENTS.length) * 100}%` }}
-                />
-              </div>
-            </div>
-
             <div
               className={cn(
-                "mt-5 hidden items-center gap-4 transition-all duration-500 lg:flex",
+                "mt-8 hidden items-center gap-4 transition-all duration-500 lg:flex",
                 done ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0",
               )}
             >

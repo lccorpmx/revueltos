@@ -1,13 +1,30 @@
 import { EASE, keyframes, motionSafe, o, r, step, t } from "@/lib/timeline";
-import { Body, Cap, Cheeks, EggProp, Eyes, EyesHappy, GroundShadow, Hand, Legs, Limb, MascotDefs, MouthOpen } from "./parts";
+import {
+  Arm,
+  ArmWave,
+  Body,
+  Cap,
+  Cheeks,
+  EggProp,
+  Eyes,
+  EyesHappy,
+  FaceFrame,
+  GroundShadow,
+  Legs,
+  MascotDefs,
+  MouthSmile,
+  pivot,
+} from "./parts";
+import { MASCOT } from "./rig";
 
 /**
  * Polaroid scene: a "live photo" of the mascot waving at the camera, then
  * showing off by tossing its egg — and winking after the catch.
  */
 const D = 4.4;
-const HELD = [50, 146] as const;
-const RELEASE = [50.5, 141.7] as const;
+const { shoulderL: SL } = MASCOT.anchors;
+const HELD = [38, 147] as const;
+const RELEASE = [38.8, 142.1] as const; // arm at -16°
 
 const frames = [
   keyframes("pl-wave", D, [
@@ -42,7 +59,7 @@ const frames = [
   keyframes("pl-fy", D, [
     [0, t(0, RELEASE[1])],
     [2.05, t(0, RELEASE[1]), EASE.up],
-    [2.47, t(0, 58), EASE.down],
+    [2.47, t(0, 62), EASE.down],
     [2.9, t(0, HELD[1])],
     [D, t(0, RELEASE[1])],
   ]),
@@ -69,8 +86,6 @@ const names = ["pl-wave", "pl-arm", "pl-held", "pl-fly", "pl-fx", "pl-fy", "pl-f
 const CSS =
   frames.join("") + motionSafe(names.map((n) => `.scene-polaroid .${n}{animation:${n} ${D}s infinite both}`).join(""));
 
-const pivot = { transformBox: "view-box", transformOrigin: "0 0" } as const;
-
 export function PolaroidScene({ className }: { className?: string }) {
   return (
     <>
@@ -78,38 +93,34 @@ export function PolaroidScene({ className }: { className?: string }) {
         {CSS}
       </style>
       <svg
-        viewBox="-10 10 230 240"
+        viewBox="-14 26 240 222"
         className={`scene-polaroid overflow-visible ${className ?? ""}`}
         aria-hidden="true"
       >
         <MascotDefs id="pl" />
         <GroundShadow />
         <Legs />
-        <Body id="pl" />
-        <Cheeks />
-        <g className="pl-look" style={pivot}>
-          <g className="pl-eyes">
-            <Eyes blinkClassName="m-blink" />
+        <Body />
+        <FaceFrame>
+          <Cheeks />
+          <g className="pl-look" style={pivot}>
+            <g className="pl-eyes">
+              <Eyes blinkClassName="m-blink" />
+            </g>
           </g>
-        </g>
-        <EyesHappy className="pl-happy" opacity={0} />
-        <MouthOpen />
-        <Cap id="pl" />
-        <g transform="translate(165 142)">
-          <g className="pl-wave" style={pivot}>
-            <Limb d="M0 0Q14 -12 16 -30" />
-            <Hand x={17} y={-34} />
-          </g>
-        </g>
-        <g transform="translate(35 142)">
+          <EyesHappy className="pl-happy" opacity={0} />
+          <MouthSmile />
+        </FaceFrame>
+        <Cap />
+        <ArmWave className="pl-wave" />
+        <g transform={`translate(${SL[0]} ${SL[1]})`}>
           <g className="pl-arm" style={pivot}>
             <g className="pl-held">
-              <g transform={`translate(${HELD[0] - 35} ${HELD[1] - 142})`}>
+              <g transform={`translate(${HELD[0] - SL[0]} ${HELD[1] - SL[1]})`}>
                 <EggProp id="pl" />
               </g>
             </g>
-            <Limb d="M0 0Q-10 18 13 22" />
-            <Hand x={15} y={20} />
+            <Arm via={[-8, 16]} to={[8, 14]} />
           </g>
         </g>
         <g className="pl-fly" opacity={0}>

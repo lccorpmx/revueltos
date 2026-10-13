@@ -33,9 +33,9 @@ export function StorySection() {
           </div>
         </Reveal>
 
-        <Reveal className="container-page py-14 lg:max-w-none lg:px-10 lg:py-20 xl:px-14">
+        <Reveal className="container-page py-20 lg:max-w-none lg:px-12 lg:py-28 xl:px-16">
           <p className="font-display text-sm font-extrabold tracking-[0.16em] text-orange-ink uppercase">Nuestra historia</p>
-          <h2 id="story-title" className="display-heavy mt-3 text-[clamp(2rem,3.6vw,3rem)] text-ink">
+          <h2 id="story-title" className="display-heavy mt-4 text-[clamp(2rem,3.6vw,3rem)] text-ink">
             Aquí todo comienza con un buen{" "}
             <span className="relative inline-block whitespace-nowrap">
               huevo
@@ -43,22 +43,22 @@ export function StorySection() {
               <Sparks className="absolute top-0 -right-10 size-8 rotate-90" />
             </span>
           </h2>
-          <div className="mt-6 space-y-3 text-[1.05rem] leading-relaxed text-ink-soft">
+          <div className="mt-8 space-y-4 text-[1.05rem] leading-relaxed text-ink-soft">
             <p>
               Revueltos nació del amor por los desayunos mexicanos, los buenos ingredientes y esos momentos simples que
               saben increíble.
             </p>
             <p>Queremos que cada bocado te recuerde que un buen día sí empieza con un buen desayuno.</p>
           </div>
-          <Button asChild variant="sun" size="pill" className="mt-8">
-            <a {...linkProps(siteConfig.links.instagram)}>
+          <Button asChild variant="sun" size="pill" className="mt-10">
+            <a {...linkProps(siteConfig.socials[0].href)}>
               Conoce más de nuestra historia
               <ArrowRight className="size-4" aria-hidden="true" />
             </a>
           </Button>
         </Reveal>
 
-        <Reveal className="pb-16 lg:py-16 lg:pr-6" delay={120}>
+        <Reveal className="pb-24 lg:py-24 lg:pr-8" delay={120}>
           <Polaroid />
         </Reveal>
       </div>

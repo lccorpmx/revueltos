@@ -2,6 +2,7 @@ import { CtaSection } from "@/components/sections/cta-section";
 import { Hero } from "@/components/sections/hero";
 import { MenuSection } from "@/components/sections/menu-section";
 import { SandwichBuilder } from "@/components/sections/sandwich-builder";
+import { SocialSection } from "@/components/sections/social-section";
 import { StorySection } from "@/components/sections/story-section";
 import { WhySection } from "@/components/sections/why-section";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -17,6 +18,7 @@ export default function Home() {
         <SandwichBuilder />
         <WhySection />
         <StorySection />
+        <SocialSection />
         <CtaSection />
       </main>
       <SiteFooter />

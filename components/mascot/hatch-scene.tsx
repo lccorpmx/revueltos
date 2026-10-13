@@ -1,5 +1,6 @@
 import { EASE, keyframes, motionSafe, o, r, rs, step, t, tr, ts } from "@/lib/timeline";
 import {
+  Arm,
   Body,
   Cap,
   Cheeks,
@@ -7,18 +8,19 @@ import {
   EggProp,
   Eyes,
   EyesHeart,
+  FaceFrame,
   GroundShadow,
-  Hand,
   Heart,
   INK,
   Legs,
-  Limb,
   MascotDefs,
   MouthOpen,
   MouthSmile,
+  pivot,
   ShellBottom,
   ShellTop,
 } from "./parts";
+import { MASCOT } from "./rig";
 
 /**
  * "¿Por qué Revueltos?" scene: the mascot holds up a sign and an egg. The egg
@@ -26,8 +28,9 @@ import {
  * then a fresh egg appears and the story starts again.
  */
 const D = 8.4;
-const EGG = [50, 146] as const; // egg center in the held hand
-const CAP_SEAT = [84, 14] as const; // where the chick perches
+const { shoulderL: SL, shoulderR: SR } = MASCOT.anchors;
+const EGG = [38, 147] as const; // egg center in the held hand
+const CAP_SEAT = [92, 27] as const; // where the chick perches on the cap
 
 const frames = [
   keyframes("ht-egg", D, [
@@ -195,8 +198,6 @@ const CSS =
       names.map((n) => `.scene-hatch .${n}{animation:${n} ${D}s infinite both}`).join(""),
   );
 
-const pivot = { transformBox: "view-box", transformOrigin: "0 0" } as const;
-
 export function HatchScene({ className, signLines }: { className?: string; signLines: string[] }) {
   return (
     <>
@@ -204,46 +205,45 @@ export function HatchScene({ className, signLines }: { className?: string; signL
         {CSS}
       </style>
       <svg
-        viewBox="-24 -70 290 320"
+        viewBox="-24 -64 300 310"
         className={`scene-hatch overflow-visible ${className ?? ""}`}
         role="img"
         aria-label={`Huevito con gorra sosteniendo un letrero que dice "${signLines.join(" ")}". En su otra mano un huevo se rompe y sale un pollito.`}
       >
         <MascotDefs id="ht" />
         <GroundShadow />
-        <g>
-          <Legs />
-          <Body id="ht" />
+        <Legs />
+        <Body />
 
-          {/* sign, held up with the far arm */}
-          <g transform="translate(176 108)">
-            <g className="ht-sign" style={pivot}>
-              <rect x="-3" y="-64" width="6" height="74" rx="2" fill="#d98a3a" stroke={INK} strokeWidth="3" />
-              <g transform="rotate(5 26 -96)">
-                <rect x="-14" y="-152" width="84" height="96" rx="4" fill="#fffdf7" stroke={INK} strokeWidth="3.6" />
-                <text
-                  x="28"
-                  y="-130"
-                  textAnchor="middle"
-                  fontSize="13.5"
-                  fill={INK}
-                  style={{ fontFamily: "var(--font-gochi), cursive" }}
-                >
-                  {signLines.map((line, i) => (
-                    <tspan key={line} x="28" dy={i === 0 ? 0 : 16}>
-                      {line}
-                    </tspan>
-                  ))}
-                </text>
-                <Heart transform="translate(52 -66)" size={0.55} fill="#ffcf2e" />
-              </g>
+        {/* sign, held up with the right hand */}
+        <g transform={`translate(${SR[0] + 12} ${SR[1] - 26})`}>
+          <g className="ht-sign" style={pivot}>
+            <rect x="-3.5" y="-60" width="7" height="72" rx="2.5" fill="#d98a3a" stroke={INK} strokeWidth="3" />
+            <g transform="rotate(5 30 -92)">
+              <rect x="-12" y="-150" width="88" height="96" rx="5" fill="#fffdf7" stroke={INK} strokeWidth="3.4" />
+              <text
+                x="32"
+                y="-127"
+                textAnchor="middle"
+                fontSize="13.5"
+                fill={INK}
+                style={{ fontFamily: "var(--font-gochi), cursive" }}
+              >
+                {signLines.map((line, i) => (
+                  <tspan key={line} x="32" dy={i === 0 ? 0 : 16}>
+                    {line}
+                  </tspan>
+                ))}
+              </text>
+              <Heart transform="translate(58 -64)" size={0.55} fill="#ffcf2e" />
             </g>
           </g>
-          <g transform="translate(165 142)">
-            <Limb d="M0 0Q14 -14 11 -28" />
-            <Hand x={11} y={-32} />
-          </g>
+        </g>
+        <g transform={`translate(${SR[0]} ${SR[1]})`}>
+          <Arm via={[-1, -20]} to={[4, -24]} twist={30} />
+        </g>
 
+        <FaceFrame>
           <Cheeks />
           <g className="ht-look" style={pivot}>
             <g className="ht-eyes">
@@ -253,47 +253,46 @@ export function HatchScene({ className, signLines }: { className?: string; signL
           <EyesHeart className="ht-heart-eyes" opacity={0} />
           <MouthSmile className="ht-smile" />
           <MouthOpen className="ht-open" opacity={0} />
-          <Cap id="ht" />
+        </FaceFrame>
+        <Cap />
 
-          {/* floating hearts */}
-          <g className="ht-hearts" opacity={0}>
-            <Heart transform="translate(24 104) rotate(-14)" size={0.8} />
-            <Heart transform="translate(6 126) rotate(10)" size={0.55} fill="#ffcf2e" />
-          </g>
+        {/* floating hearts */}
+        <g className="ht-hearts" opacity={0}>
+          <Heart transform="translate(44 98) rotate(-14)" size={0.8} />
+          <Heart transform="translate(26 116) rotate(10)" size={0.55} fill="#ffcf2e" />
+        </g>
 
-          {/* egg hand */}
-          <g transform={`translate(${EGG[0]} ${EGG[1]})`}>
-            <g className="ht-shell" opacity={0}>
-              <g transform="translate(0 4)">
-                <ShellBottom id="ht" />
-              </g>
-            </g>
-            <g className="ht-egg" style={{ transformBox: "view-box", transformOrigin: "0 12px" }}>
-              <EggProp id="ht" />
-              <path
-                className="ht-crackline"
-                opacity={0}
-                d="M-12 0L-7 -4L-3 1L1 -4L5 1L9 -4L12 -1"
-                fill="none"
-                stroke={INK}
-                strokeWidth="2.4"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-              />
-            </g>
-            <g className="ht-lid" opacity={0} style={pivot}>
-              <ShellTop id="ht" />
-            </g>
-            <g className="ht-poof" opacity={0}>
-              <circle cx="-9" cy="-4" r="7" fill="#fff" stroke={INK} strokeWidth="2.4" />
-              <circle cx="6" cy="-9" r="8" fill="#fff" stroke={INK} strokeWidth="2.4" />
-              <circle cx="9" cy="4" r="6" fill="#fff" stroke={INK} strokeWidth="2.4" />
+        {/* egg hand */}
+        <g transform={`translate(${EGG[0]} ${EGG[1]})`}>
+          <g className="ht-shell" opacity={0}>
+            <g transform="translate(0 4)">
+              <ShellBottom id="ht" />
             </g>
           </g>
-          <g transform="translate(35 142)">
-            <Limb d="M0 0Q-10 18 13 22" />
-            <Hand x={15} y={20} />
+          <g className="ht-egg" style={{ transformBox: "view-box", transformOrigin: "0 12px" }}>
+            <EggProp id="ht" />
+            <path
+              className="ht-crackline"
+              opacity={0}
+              d="M-12 0L-7 -4L-3 1L1 -4L5 1L9 -4L12 -1"
+              fill="none"
+              stroke={INK}
+              strokeWidth="2.4"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
           </g>
+          <g className="ht-lid" opacity={0} style={pivot}>
+            <ShellTop id="ht" />
+          </g>
+          <g className="ht-poof" opacity={0}>
+            <circle cx="-9" cy="-4" r="7" fill="#fff" stroke={INK} strokeWidth="2.4" />
+            <circle cx="6" cy="-9" r="8" fill="#fff" stroke={INK} strokeWidth="2.4" />
+            <circle cx="9" cy="4" r="6" fill="#fff" stroke={INK} strokeWidth="2.4" />
+          </g>
+        </g>
+        <g transform={`translate(${SL[0]} ${SL[1]})`}>
+          <Arm via={[-8, 16]} to={[8, 14]} />
         </g>
 
         {/* the chick lives outside the body so it can fly away */}
@@ -308,7 +307,7 @@ export function HatchScene({ className, signLines }: { className?: string; signL
                   className="ht-wing"
                   style={pivot}
                   d="M0 0Q10 -8 13 3Q8 8 0 5Z"
-                  fill="#ffd23a"
+                  fill="#facc15"
                   stroke={INK}
                   strokeWidth="2.2"
                   strokeLinejoin="round"
@@ -330,7 +329,6 @@ export function HatchScene({ className, signLines }: { className?: string; signL
   );
 }
 
-/** Speech bubble whose tail (bottom-right) points at the origin + (8, 33). */
 function SpeechBubble({ text }: { text: string }) {
   const w = 14 + text.length * 7.4;
   return (

@@ -1,33 +1,33 @@
-import type { SVGProps } from "react";
+import type { CSSProperties, ReactNode, SVGProps } from "react";
+import { preload } from "react-dom";
+import { MASCOT } from "./rig";
 
 /**
- * Building blocks for the Revueltos egg mascot. All parts share one local
- * coordinate system (body centered at x=100, feet on y≈232) so scenes can
- * compose and animate them with plain CSS transforms.
+ * Building blocks for the Revueltos mascot, faithful to the reference art:
+ * body and cap are raster layers cut from it, while face, arms and legs are
+ * vector (traced from the same art) so scenes can pose and animate them.
+ * All parts share the mascot space defined in ./rig.
  */
 
-export const INK = "#1b1915";
-const OUTLINE = { stroke: INK, strokeLinecap: "round", strokeLinejoin: "round" } as const;
+export const INK = "#0d0b09";
+const LINE = { stroke: INK, strokeLinecap: "round", strokeLinejoin: "round" } as const;
 
 type G = SVGProps<SVGGElement>;
+type Pt = readonly [number, number];
+
+/** CSS transforms on these groups pivot on (x, y) in mascot space. */
+export const pivotAt = (x: number, y: number): CSSProperties => ({
+  transformBox: "view-box",
+  transformOrigin: `${x}px ${y}px`,
+});
+export const pivot: CSSProperties = { transformBox: "view-box", transformOrigin: "0 0" };
 
 export function MascotDefs({ id }: { id: string }) {
+  // The hero mascot is above the fold: start fetching its layers early.
+  preload(MASCOT.body.href, { as: "image" });
+  preload(MASCOT.cap.href, { as: "image" });
   return (
     <defs>
-      <radialGradient id={`${id}-body`} cx="36%" cy="30%" r="78%">
-        <stop offset="0" stopColor="#fff3a3" />
-        <stop offset="0.36" stopColor="#ffe24a" />
-        <stop offset="0.72" stopColor="#ffca20" />
-        <stop offset="1" stopColor="#f3a20b" />
-      </radialGradient>
-      <linearGradient id={`${id}-cap`} x1="0" y1="0" x2="0.3" y2="1">
-        <stop offset="0" stopColor="#ffe866" />
-        <stop offset="1" stopColor="#ffc41d" />
-      </linearGradient>
-      <linearGradient id={`${id}-brim`} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stopColor="#ffd83c" />
-        <stop offset="1" stopColor="#f0ac0d" />
-      </linearGradient>
       <radialGradient id={`${id}-egg`} cx="38%" cy="32%" r="75%">
         <stop offset="0" stopColor="#ffffff" />
         <stop offset="0.7" stopColor="#fff8ea" />
@@ -41,89 +41,177 @@ export function MascotDefs({ id }: { id: string }) {
   );
 }
 
-export function GroundShadow({ rx = 58, ...props }: G & { rx?: number }) {
+export function GroundShadow({ rx = 66, ...props }: G & { rx?: number }) {
   return (
     <g {...props}>
-      <ellipse cx="100" cy="234" rx={rx} ry="7.5" fill="#000" opacity="0.13" />
+      <ellipse cx="98" cy="236" rx={rx} ry="7" fill="#000" opacity="0.13" />
     </g>
   );
 }
 
-export function Body({ id }: { id: string }) {
+export function Body() {
+  const b = MASCOT.body;
+  return <image href={b.href} x={b.x} y={b.y} width={b.width} height={b.height} />;
+}
+
+/** The backwards cap. Animate the wrapper (it pivots near the brim). */
+export function Cap({ className, style }: { className?: string; style?: CSSProperties }) {
+  const c = MASCOT.cap;
   return (
-    <g>
-      <path
-        d="M100 40C138 40 168 92 168 134C168 174 138 200 100 200C62 200 32 174 32 134C32 92 62 40 100 40Z"
-        fill={`url(#${id}-body)`}
-        strokeWidth="5"
-        {...OUTLINE}
-      />
-      <path d="M62 184C82 197 122 198 144 181" fill="none" stroke="#e48c08" strokeWidth="6" strokeLinecap="round" opacity="0.32" />
-      <path d="M53 116C51 96 59 78 71 66" fill="none" stroke="#fff" strokeWidth="7" strokeLinecap="round" opacity="0.75" />
-      <circle cx="55" cy="132" r="3.6" fill="#fff" opacity="0.8" />
+    <g className={className} style={style}>
+      <image href={c.href} x={c.x} y={c.y} width={c.width} height={c.height} />
     </g>
   );
 }
 
-/** Backwards snapback cap. The outer group holds the static tilt so the
- *  inner one can be animated freely. */
-export function Cap({ id, className }: { id: string; className?: string }) {
+/** Traced legs; pass classes to animate each one around its hip. */
+export function Legs({ leftClassName, rightClassName }: { leftClassName?: string; rightClassName?: string }) {
+  const { hipL, hipR } = MASCOT.anchors;
   return (
-    <g transform="rotate(-9 100 70)">
-      <g className={className}>
-        <path
-          d="M44 92C40 56 70 26 104 26C138 26 160 52 158 88C128 98 76 100 44 92Z"
-          fill={`url(#${id}-cap)`}
-          strokeWidth="5"
-          {...OUTLINE}
-        />
-        <path d="M114 86C113 70 139 64 145 81Z" fill="#e7a10a" strokeWidth="4" {...OUTLINE} />
-        <path d="M102 31C94 47 89 65 89 91" fill="none" strokeWidth="3.4" {...OUTLINE} />
-        <circle cx="103" cy="27.5" r="5.4" fill="#ffd93d" strokeWidth="4" {...OUTLINE} />
-        <path
-          d="M50 86C33 81 12 86 7 98C4 106 19 109 38 105C51 102 58 95 50 86Z"
-          fill={`url(#${id}-brim)`}
-          strokeWidth="5"
-          {...OUTLINE}
-        />
-        <path d="M60 56C67 44 80 36 93 34" fill="none" stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.65" />
+    <g fill={INK}>
+      <g className={leftClassName} style={pivotAt(hipL[0], hipL[1])}>
+        <path d={MASCOT.paths.legL} />
+      </g>
+      <g className={rightClassName} style={pivotAt(hipR[0], hipR[1])}>
+        <path d={MASCOT.paths.legR} />
       </g>
     </g>
   );
 }
 
-/** Both eyes. `blinkClassName` should scale around each eye's own box. */
-export function Eyes({ blinkClassName, wide = false }: { blinkClassName?: string; wide?: boolean }) {
-  const ry = wide ? 11 : 9.2;
-  const rx = wide ? 8.4 : 7;
+/** Reference pose: right arm waving. Rotates around the right shoulder. */
+export function ArmWave({ className }: { className?: string }) {
+  const [x, y] = MASCOT.anchors.shoulderR;
   return (
-    <g>
-      {[84, 117].map((cx) => (
+    <g className={className} style={pivotAt(x, y)}>
+      <path d={MASCOT.paths.armWave} fill={INK} />
+    </g>
+  );
+}
+
+/** Reference pose: left hand resting on the hip. */
+export function ArmHip(props: G) {
+  return (
+    <g {...props}>
+      <path d={MASCOT.paths.armHip} fill={INK} />
+    </g>
+  );
+}
+
+/** Stick arm drawn from a shoulder pivot at (0,0). */
+export function Limb({ d }: { d: string }) {
+  return <path d={d} fill="none" strokeWidth={MASCOT.armWidth} {...LINE} />;
+}
+
+export type HandPose = "mitten" | "open";
+
+/**
+ * Cartoon hand with the wrist on (x, y) and the fingers along `angle`
+ * (0 = pointing right). The thumb sits on the -y side; `flip` mirrors it.
+ */
+export function Hand({
+  x = 0,
+  y = 0,
+  angle = 0,
+  pose = "mitten",
+  flip = false,
+}: {
+  x?: number;
+  y?: number;
+  angle?: number;
+  pose?: HandPose;
+  flip?: boolean;
+}) {
+  return (
+    <g fill={INK} transform={`translate(${x} ${y}) rotate(${angle})${flip ? " scale(1 -1)" : ""}`}>
+      <path d="M0 0H3" strokeWidth={MASCOT.armWidth} {...LINE} />
+      {pose === "open" ? (
+        <>
+          <ellipse cx={6} cy={0.6} rx={5.2} ry={5} />
+          <path d="M7 -1.4L12.8 -5.2M8 0.6L14.6 0.7M7 2.6L12.2 5.9" fill="none" strokeWidth={5} {...LINE} />
+          <path d="M4.4 -2L5 -7.6" fill="none" strokeWidth={4.6} {...LINE} />
+        </>
+      ) : (
+        <>
+          <ellipse cx={8.6} cy={0.8} rx={7} ry={5.9} />
+          <ellipse cx={6.6} cy={-5.5} rx={4.1} ry={2.4} transform="rotate(-58 6.6 -5.5)" />
+        </>
+      )}
+    </g>
+  );
+}
+
+/**
+ * Stick arm from a shoulder pivot at (0,0), curving through `via` to the
+ * wrist at `to`. The hand follows the arm's direction, plus `twist` degrees.
+ */
+export function Arm({
+  via,
+  to,
+  hand,
+  twist = 0,
+  flip,
+}: {
+  via: Pt;
+  to: Pt;
+  hand?: HandPose;
+  twist?: number;
+  flip?: boolean;
+}) {
+  const angle = (Math.atan2(to[1] - via[1], to[0] - via[0]) * 180) / Math.PI + twist;
+  return (
+    <>
+      <Limb d={`M0 0Q${via[0]} ${via[1]} ${to[0]} ${to[1]}`} />
+      <Hand x={to[0]} y={to[1]} angle={Math.round(angle * 10) / 10} pose={hand} flip={flip} />
+    </>
+  );
+}
+
+/* ——— Face (local frame: origin between the eyes, tilted like the art) ——— */
+
+const F = MASCOT.face;
+
+export function FaceFrame({ children }: { children: ReactNode }) {
+  return <g transform={`translate(${F.origin[0]} ${F.origin[1]}) rotate(${F.tilt})`}>{children}</g>;
+}
+
+/** Converts a point of the face frame to mascot space (for props near the face). */
+export function facePoint([x, y]: Pt): Pt {
+  const a = (F.tilt * Math.PI) / 180;
+  return [F.origin[0] + x * Math.cos(a) - y * Math.sin(a), F.origin[1] + x * Math.sin(a) + y * Math.cos(a)];
+}
+
+export function Eyes({ blinkClassName, wide = false }: { blinkClassName?: string; wide?: boolean }) {
+  const k = wide ? 1.25 : 1;
+  return (
+    <g fill={INK}>
+      {[-F.eye.x, F.eye.x].map((cx) => (
         <g key={cx} className={blinkClassName}>
-          <ellipse cx={cx} cy="128" rx={rx} ry={ry} fill={INK} />
-          <circle cx={cx + 2.5} cy={124.2} r={wide ? 3.1 : 2.6} fill="#fff" />
+          <ellipse cx={cx} cy={0} rx={F.eye.rx * k} ry={F.eye.ry * k} />
         </g>
       ))}
     </g>
   );
 }
 
-/** Happy closed eyes "^ ^" (used when proud or when winking with both). */
+/** Happy closed eyes "^ ^". */
 export function EyesHappy(props: G) {
   return (
-    <g {...props}>
-      <path d="M77 130Q84 121 91 130" fill="none" strokeWidth="4.2" {...OUTLINE} />
-      <path d="M110 130Q117 121 124 130" fill="none" strokeWidth="4.2" {...OUTLINE} />
+    <g fill="none" strokeWidth={3.2} {...LINE} {...props}>
+      {[-F.eye.x, F.eye.x].map((cx) => (
+        <path key={cx} d={`M${cx - 5.5} 2.5Q${cx} -5.5 ${cx + 5.5} 2.5`} />
+      ))}
     </g>
   );
 }
 
-/** Squeezed eyes "> <" for scared reactions. */
+/** Squeezed eyes "> <". */
 export function EyesSqueeze(props: G) {
+  const x = F.eye.x;
   return (
-    <g {...props}>
-      <path d="M78 122L90 128L78 134" fill="none" strokeWidth="4" {...OUTLINE} />
-      <path d="M123 122L111 128L123 134" fill="none" strokeWidth="4" {...OUTLINE} />
+    <g fill="none" strokeWidth={3.2} {...LINE} {...props}>
+      <path d={`M${-x - 5} -5L${-x + 4} 0L${-x - 5} 5`} />
+      <path d={`M${x + 5} -5L${x - 4} 0L${x + 5} 5`} />
     </g>
   );
 }
@@ -131,15 +219,28 @@ export function EyesSqueeze(props: G) {
 export function EyesHeart(props: G) {
   return (
     <g {...props}>
-      {[84, 117].map((cx) => (
+      {[-F.eye.x, F.eye.x].map((cx) => (
         <path
           key={cx}
-          d={`M${cx} 136C${cx - 12} 128 ${cx - 9} 118 ${cx - 3} 120C${cx - 1} 121 ${cx} 123 ${cx} 124C${cx} 123 ${cx + 1} 121 ${cx + 3} 120C${cx + 9} 118 ${cx + 12} 128 ${cx} 136Z`}
+          d={`M${cx} 7C${cx - 11} 0 ${cx - 8} -9 ${cx - 3} -7C${cx - 1} -6 ${cx} -4.5 ${cx} -3.5C${cx} -4.5 ${cx + 1} -6 ${cx + 3} -7C${cx + 8} -9 ${cx + 11} 0 ${cx} 7Z`}
           fill="#ff5d5d"
-          strokeWidth="2.6"
-          {...OUTLINE}
+          strokeWidth={2.2}
+          {...LINE}
         />
       ))}
+    </g>
+  );
+}
+
+/** Wink: left eye closed, right eye open. */
+export function EyesWink({ blinkClassName, ...props }: G & { blinkClassName?: string }) {
+  const x = F.eye.x;
+  return (
+    <g {...props}>
+      <path d={`M${-x - 5.5} 1.5Q${-x} -5 ${-x + 5.5} 1.5`} fill="none" strokeWidth={3.2} {...LINE} />
+      <g className={blinkClassName}>
+        <ellipse cx={x} cy={0} rx={F.eye.rx} ry={F.eye.ry} fill={INK} />
+      </g>
     </g>
   );
 }
@@ -147,7 +248,7 @@ export function EyesHeart(props: G) {
 export function MouthSmile(props: G) {
   return (
     <g {...props}>
-      <path d="M91 146Q100.5 155 110 146" fill="none" strokeWidth="4.2" {...OUTLINE} />
+      <path d={F.smile} fill="none" strokeWidth={F.smileWidth} {...LINE} />
     </g>
   );
 }
@@ -155,8 +256,8 @@ export function MouthSmile(props: G) {
 export function MouthOpen(props: G) {
   return (
     <g {...props}>
-      <path d="M89 144Q100.5 164 112 144Z" fill="#7d2411" strokeWidth="3.6" {...OUTLINE} />
-      <path d="M95 154Q100.5 150 106 154Q100.5 159 95 154Z" fill="#ff7b6b" />
+      <path d="M-8 7Q0.8 23 9.5 7Z" fill="#7d2411" strokeWidth={2.8} {...LINE} />
+      <path d="M-3.5 13.6Q0.8 10.6 5 13.6Q0.8 17.4 -3.5 13.6Z" fill="#ff7b6b" />
     </g>
   );
 }
@@ -164,7 +265,7 @@ export function MouthOpen(props: G) {
 export function MouthO(props: G) {
   return (
     <g {...props}>
-      <ellipse cx="100.5" cy="151" rx="5.4" ry="6.8" fill="#7d2411" strokeWidth="3.4" {...OUTLINE} />
+      <ellipse cx={0.8} cy={11} rx={4.3} ry={5.4} fill="#7d2411" strokeWidth={2.8} {...LINE} />
     </g>
   );
 }
@@ -172,49 +273,21 @@ export function MouthO(props: G) {
 export function MouthWobble(props: G) {
   return (
     <g {...props}>
-      <path d="M90 150Q95 145 100 150Q105 155 111 150" fill="none" strokeWidth="4" {...OUTLINE} />
+      <path d="M-8 10Q-4 6 0.5 10Q5 14 9.5 10" fill="none" strokeWidth={3.2} {...LINE} />
     </g>
   );
 }
 
 export function Cheeks(props: G) {
   return (
-    <g {...props}>
-      <ellipse cx="68" cy="146" rx="9" ry="5.4" fill="#ff8a4c" opacity="0.55" />
-      <ellipse cx="133" cy="146" rx="9" ry="5.4" fill="#ff8a4c" opacity="0.55" />
+    <g fill="#fc9011" {...props}>
+      <ellipse cx={F.cheekL.x} cy={F.cheekL.y} rx={F.cheekL.rx} ry={F.cheekL.ry} />
+      <ellipse cx={F.cheekR.x} cy={F.cheekR.y} rx={F.cheekR.rx} ry={F.cheekR.ry} />
     </g>
   );
 }
 
-/** Stick arm/leg drawn from a pivot at (0,0). */
-export function Limb({ d }: { d: string }) {
-  return <path d={d} fill="none" strokeWidth="5" {...OUTLINE} />;
-}
-
-/** Little mitten: a palm with a thumb bump. */
-export function Hand({ x, y, flip = false }: { x: number; y: number; flip?: boolean }) {
-  const s = flip ? -1 : 1;
-  return (
-    <g>
-      <circle cx={x + 6.5 * s} cy={y - 5.5} r="4" fill="#ffd23a" strokeWidth="3.4" {...OUTLINE} />
-      <circle cx={x} cy={y} r="9" fill="#ffd83c" strokeWidth="4" {...OUTLINE} />
-      <path d={`M${x - 3.5 * s} ${y - 3.5}Q${x - 1 * s} ${y - 6} ${x + 2 * s} ${y - 5.5}`} fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" opacity="0.7" />
-    </g>
-  );
-}
-
-export function Legs() {
-  return (
-    <g>
-      <Limb d="M86 196L82 226" />
-      <Limb d="M114 196L118 226" />
-      <ellipse cx="77" cy="229" rx="11.5" ry="6.6" fill={INK} />
-      <ellipse cx="123" cy="229" rx="11.5" ry="6.6" fill={INK} />
-      <ellipse cx="73" cy="226.5" rx="3.5" ry="1.8" fill="#fff" opacity="0.35" />
-      <ellipse cx="119" cy="226.5" rx="3.5" ry="1.8" fill="#fff" opacity="0.35" />
-    </g>
-  );
-}
+/* ——— Props ——— */
 
 /** A whole raw egg centered on (0,0). */
 export function EggProp({ id, scale = 1 }: { id: string; scale?: number }) {
@@ -223,8 +296,8 @@ export function EggProp({ id, scale = 1 }: { id: string; scale?: number }) {
       <path
         d="M0 -14.5C8.5 -14.5 12.5 -4 12.5 3C12.5 10.5 7 14.5 0 14.5C-7 14.5 -12.5 10.5 -12.5 3C-12.5 -4 -8.5 -14.5 0 -14.5Z"
         fill={`url(#${id}-egg)`}
-        strokeWidth="3.4"
-        {...OUTLINE}
+        strokeWidth="3"
+        {...LINE}
       />
       <ellipse cx="-4.5" cy="-5" rx="2.6" ry="4.4" fill="#fff" transform="rotate(18 -4.5 -5)" />
     </g>
@@ -237,8 +310,8 @@ export function ShellBottom({ id }: { id: string }) {
     <path
       d="M-12.5 -1L-8 -5L-4 0L0 -5L4 0L8 -5L12.5 -1C12.5 8 7 14.5 0 14.5C-7 14.5 -12.5 8 -12.5 -1Z"
       fill={`url(#${id}-egg)`}
-      strokeWidth="3.2"
-      {...OUTLINE}
+      strokeWidth="3"
+      {...LINE}
     />
   );
 }
@@ -248,8 +321,8 @@ export function ShellTop({ id }: { id: string }) {
     <path
       d="M-12.5 -1C-12.5 -6 -8.5 -14.5 0 -14.5C8.5 -14.5 12.5 -6 12.5 -1L8 -5L4 0L0 -5L-4 0L-8 -5Z"
       fill={`url(#${id}-egg)`}
-      strokeWidth="3.2"
-      {...OUTLINE}
+      strokeWidth="3"
+      {...LINE}
     />
   );
 }
@@ -262,9 +335,9 @@ export function SplatPuddle({ id }: { id: string }) {
         d="M-34 0C-36 -7 -20 -11 -8 -9C2 -13 24 -11 32 -4C38 2 24 7 8 7C-6 9 -32 7 -34 0Z"
         fill="#fffdf6"
         strokeWidth="3"
-        {...OUTLINE}
+        {...LINE}
       />
-      <ellipse cx="1" cy="-3" rx="10" ry="6.4" fill={`url(#${id}-yolk)`} strokeWidth="3" {...OUTLINE} />
+      <ellipse cx="1" cy="-3" rx="10" ry="6.4" fill={`url(#${id}-yolk)`} strokeWidth="3" {...LINE} />
       <ellipse cx="-2.5" cy="-5" rx="3" ry="1.6" fill="#fff" opacity="0.85" />
     </g>
   );
@@ -273,16 +346,14 @@ export function SplatPuddle({ id }: { id: string }) {
 export function Chick() {
   return (
     <g>
-      <path d="M-11 -2C-11 -12 -5 -18 1 -18C8 -18 12 -12 12 -4C12 4 7 8 0 8C-7 8 -11 5 -11 -2Z" fill="#ffe14d" strokeWidth="3" {...OUTLINE} />
-      <path d="M-1 -18Q0 -24 3 -22M1 -18Q4 -23 6 -20" fill="none" strokeWidth="2.4" {...OUTLINE} />
+      <path d="M-11 -2C-11 -12 -5 -18 1 -18C8 -18 12 -12 12 -4C12 4 7 8 0 8C-7 8 -11 5 -11 -2Z" fill="#fde047" strokeWidth="2.6" {...LINE} />
+      <path d="M-1 -18Q0 -24 3 -22M1 -18Q4 -23 6 -20" fill="none" strokeWidth="2.2" {...LINE} />
       <circle cx="-3" cy="-9" r="2" fill={INK} />
       <circle cx="5.5" cy="-9" r="2" fill={INK} />
-      <circle cx="-2.4" cy="-9.7" r="0.7" fill="#fff" />
-      <circle cx="6.1" cy="-9.7" r="0.7" fill="#fff" />
-      <path d="M-0.5 -6L1.5 -2.5L3.5 -6Z" fill="#ff8a1f" strokeWidth="1.8" {...OUTLINE} />
-      <ellipse cx="-7.5" cy="-4" rx="2.4" ry="1.4" fill="#ff8a4c" opacity="0.6" />
-      <ellipse cx="10" cy="-4" rx="2.2" ry="1.4" fill="#ff8a4c" opacity="0.6" />
-      <path d="M-10 -1Q-15 -4 -14 2" fill="#ffd83c" strokeWidth="2.4" {...OUTLINE} />
+      <path d="M-0.5 -6L1.5 -2.5L3.5 -6Z" fill="#ff8a1f" strokeWidth="1.6" {...LINE} />
+      <ellipse cx="-7.5" cy="-4" rx="2.4" ry="1.4" fill="#fc9011" opacity="0.8" />
+      <ellipse cx="10" cy="-4" rx="2.2" ry="1.4" fill="#fc9011" opacity="0.8" />
+      <path d="M-10 -1Q-15 -4 -14 2" fill="#facc15" strokeWidth="2.2" {...LINE} />
     </g>
   );
 }
@@ -294,8 +365,8 @@ export function Heart({ size = 1, fill = "#ff6a5c", ...props }: G & { size?: num
         transform={`scale(${size})`}
         d="M0 8C-11 1 -10 -8 -4 -8C-2 -8 -0.5 -6.5 0 -5C0.5 -6.5 2 -8 4 -8C10 -8 11 1 0 8Z"
         fill={fill}
-        strokeWidth={2.6 / size}
-        {...OUTLINE}
+        strokeWidth={2.4 / size}
+        {...LINE}
       />
     </g>
   );
@@ -304,8 +375,27 @@ export function Heart({ size = 1, fill = "#ff6a5c", ...props }: G & { size?: num
 export function SweatDrop(props: G) {
   return (
     <g {...props}>
-      <path d="M0 -9C3 -4 6 0 6 3.5C6 7 3.4 9 0 9C-3.4 9 -6 7 -6 3.5C-6 0 -3 -4 0 -9Z" fill="#8fd3ff" strokeWidth="2.6" {...OUTLINE} />
+      <path d="M0 -9C3 -4 6 0 6 3.5C6 7 3.4 9 0 9C-3.4 9 -6 7 -6 3.5C-6 0 -3 -4 0 -9Z" fill="#8fd3ff" strokeWidth="2.4" {...LINE} />
       <ellipse cx="-2" cy="3" rx="1.2" ry="2" fill="#fff" />
+    </g>
+  );
+}
+
+/** Reference pose (waving, hand on hip): the mascot exactly as drawn. */
+export function MascotPose({ id, waveClassName }: { id: string; waveClassName?: string }) {
+  return (
+    <g>
+      <MascotDefs id={id} />
+      <Legs />
+      <Body />
+      <ArmHip />
+      <ArmWave className={waveClassName} />
+      <FaceFrame>
+        <Cheeks />
+        <Eyes blinkClassName="m-blink" />
+        <MouthSmile />
+      </FaceFrame>
+      <Cap />
     </g>
   );
 }

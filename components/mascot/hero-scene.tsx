@@ -1,42 +1,44 @@
 import { EASE, keyframes, motionSafe, o, r, step, t, tr, ts } from "@/lib/timeline";
 import {
+  Arm,
+  ArmHip,
   Body,
   Cap,
   Cheeks,
   EggProp,
   Eyes,
   EyesSqueeze,
+  FaceFrame,
   GroundShadow,
-  Hand,
   INK,
   Legs,
-  Limb,
   MascotDefs,
   MouthO,
   MouthOpen,
   MouthSmile,
+  pivot,
+  pivotAt,
   ShellBottom,
   ShellTop,
   SplatPuddle,
   SweatDrop,
 } from "./parts";
+import { MASCOT } from "./rig";
 
 /**
  * Hero scene: "El Malabarista" tosses an egg, catches it twice, misses the
- * third toss (¡crack!) and pulls a fresh one out of his cap. "El Mirón", a
- * smaller egg, follows every throw with his eyes and reacts to the crash.
- *
- * Coordinates are in each mascot's local space (see ./parts).
+ * third toss (¡crack!) and pops a fresh one out from behind his cap.
+ * "El Mirón", a smaller egg, follows every throw with his eyes.
  */
 const D = 9.6;
+const { shoulderL: SL, shoulderR: SR } = MASCOT.anchors;
 
-// Right hand / held egg geometry (juggler local space).
-const SHOULDER_R = [165, 142] as const;
-const SHOULDER_L = [35, 142] as const;
-const HELD = [194, 134] as const; // held egg center at rest
-const RELEASE = [186.1, 120.6] as const; // held egg center with the arm at -30°
-const RELEASE_BIG = [182.1, 117.2] as const; // …and at -40°
-const IMPACT = [232, 219] as const;
+// Held egg relative to the right shoulder, and where it leaves the hand.
+const HELD = [SR[0] + 23, SR[1] - 2] as const;
+const RELEASE = [195.2, 113.8] as const; // arm at -30°
+const RELEASE_BIG = [192.6, 110.7] as const; // arm at -40°
+const IMPACT = [240, 222.5] as const;
+const FLOOR = 237;
 
 const juggler = [
   keyframes("jg-arm", D, [
@@ -71,15 +73,6 @@ const juggler = [
     [8.68, r(0)],
     [D, r(0)],
   ]),
-  keyframes("jg-arm-l", D, [
-    [0, r(0)],
-    [7.38, r(0), EASE.inOut],
-    [7.62, r(165), EASE.out],
-    [7.8, r(172)],
-    [8.2, r(172), EASE.inOut],
-    [8.46, r(0)],
-    [D, r(0)],
-  ]),
   keyframes("jg-body", D, [
     [0, tr(0, 0, 0)],
     [4.04, tr(0, 0, 0), EASE.out],
@@ -89,6 +82,11 @@ const juggler = [
     [6.3, tr(0, 0, 7), EASE.inOut],
     [6.7, tr(0, 0, 5), EASE.inOut],
     [7.1, tr(0, 0, 0)],
+    // crouch and hop: the fresh egg pops out from behind the cap
+    [7.56, tr(0, 0, 0), EASE.inOut],
+    [7.78, tr(0, 5, 0), EASE.out],
+    [7.9, tr(0, -6, 0), EASE.in],
+    [8.04, tr(0, 0, 0)],
     [D, tr(0, 0, 0)],
   ]),
   keyframes("jg-held", D, [
@@ -124,13 +122,13 @@ const juggler = [
   keyframes("jg-fy", D, [
     [0, t(0, RELEASE[1])],
     [0.74, t(0, RELEASE[1]), EASE.up],
-    [1.32, t(0, 6), EASE.down],
+    [1.32, t(0, 0), EASE.down],
     [1.9, t(0, HELD[1])],
     [2.84, t(0, RELEASE[1]), EASE.up],
-    [3.42, t(0, -10), EASE.down],
+    [3.42, t(0, -14), EASE.down],
     [4.0, t(0, HELD[1])],
     [4.96, t(0, RELEASE_BIG[1]), EASE.up],
-    [5.7, t(0, -92), EASE.down],
+    [5.7, t(0, -95), EASE.down],
     [6.52, t(0, IMPACT[1])],
     [D, t(0, IMPACT[1])],
   ]),
@@ -145,22 +143,22 @@ const juggler = [
     [D, r(560)],
   ]),
   keyframes("jg-look", D, [
-    [0, t(2.5, 1)],
-    [0.74, t(2.5, 0), EASE.up],
-    [1.32, t(1.5, -4.5), EASE.down],
-    [1.9, t(2.5, 1)],
-    [2.84, t(2.5, 0), EASE.up],
-    [3.42, t(1.5, -5), EASE.down],
-    [4.0, t(2.5, 1)],
-    [4.96, t(2.5, 0), EASE.up],
-    [5.7, t(2, -5.5), EASE.down],
+    [0, t(3, 1)],
+    [0.74, t(3, 0), EASE.up],
+    [1.32, t(2, -4.5), EASE.down],
+    [1.9, t(3, 1)],
+    [2.84, t(3, 0), EASE.up],
+    [3.42, t(2, -5), EASE.down],
+    [4.0, t(3, 1)],
+    [4.96, t(3, 0), EASE.up],
+    [5.7, t(2.5, -5.5), EASE.down],
     [6.3, t(4, 1)],
     [6.52, t(4, 4)],
     [7.4, t(4, 4), EASE.inOut],
-    [7.7, t(-1, -3.5)],
-    [8.1, t(1.5, -4)],
-    [8.45, t(2.5, 1)],
-    [D, t(2.5, 1)],
+    [7.7, t(-1.5, -4)],
+    [8.1, t(1.5, -4.5)],
+    [8.45, t(3, 1)],
+    [D, t(3, 1)],
   ]),
   keyframes("jg-wide", D, [
     [0, "transform:scale(1)"],
@@ -231,33 +229,20 @@ const juggler = [
     [7.6, `transform:scale(0.85) rotate(-8deg);${o(0)}`],
     [D, `transform:scale(0.3) rotate(-8deg);${o(0)}`],
   ]),
-  keyframes("jg-cap", D, [
-    [0, tr(0, 0, 0)],
-    [7.68, tr(0, 0, 0), EASE.out],
-    [7.84, tr(2, -26, -7)],
-    [8.18, tr(2, -26, -7), EASE.snap],
-    [8.32, tr(0, 0, 0)],
-    [D, tr(0, 0, 0)],
-  ]),
-  keyframes("jg-new", D, [
-    [0, o(0)],
-    ...step(7.82, o(0), o(1)),
-    ...step(8.45, o(1), o(0)),
-    [D, o(0)],
-  ]),
+  keyframes("jg-new", D, [[0, o(0)], ...step(7.82, o(0), o(1)), ...step(8.45, o(1), o(0)), [D, o(0)]]),
   keyframes("jg-nx", D, [
-    [0, t(104, 0)],
-    [7.82, t(104, 0), EASE.linear],
-    [7.98, t(112, 0), EASE.linear],
-    [8.16, t(152, 0), EASE.linear],
+    [0, t(92, 0)],
+    [7.82, t(92, 0), EASE.linear],
+    [7.98, t(100, 0), EASE.linear],
+    [8.16, t(150, 0), EASE.linear],
     [8.45, t(HELD[0], 0)],
     [D, t(HELD[0], 0)],
   ]),
   keyframes("jg-ny", D, [
-    [0, t(0, 78)],
-    [7.82, t(0, 78), EASE.out],
-    [7.98, t(0, -2), EASE.up],
-    [8.16, t(0, -24), EASE.down],
+    [0, t(0, 62)],
+    [7.82, t(0, 62), EASE.out],
+    [7.98, t(0, -4), EASE.up],
+    [8.16, t(0, -26), EASE.down],
     [8.45, t(0, HELD[1])],
     [D, t(0, HELD[1])],
   ]),
@@ -302,24 +287,24 @@ const watcher = [
   keyframes("wt-arm-l", D, [
     [0, r(0)],
     [4.0, r(0), EASE.out],
-    [4.12, r(100)],
-    [4.5, r(100), EASE.inOut],
+    [4.12, r(122)],
+    [4.5, r(122), EASE.inOut],
     [4.66, r(0)],
     [6.5, r(0), EASE.snap],
-    [6.62, r(-126)],
-    [7.5, r(-126), EASE.inOut],
+    [6.62, r(122)],
+    [7.5, r(122), EASE.inOut],
     [7.7, r(0)],
     [D, r(0)],
   ]),
   keyframes("wt-arm-r", D, [
     [0, r(0)],
     [4.0, r(0), EASE.out],
-    [4.12, r(-100)],
-    [4.5, r(-100), EASE.inOut],
+    [4.12, r(-122)],
+    [4.5, r(-122), EASE.inOut],
     [4.66, r(0)],
     [6.5, r(0), EASE.snap],
-    [6.62, r(126)],
-    [7.5, r(126), EASE.inOut],
+    [6.62, r(-122)],
+    [7.5, r(-122), EASE.inOut],
     [7.7, r(0)],
     [D, r(0)],
   ]),
@@ -340,52 +325,45 @@ const watcher = [
   ]),
 ];
 
-const anim = (cls: string, name = cls) => `.scene-hero .${cls}{animation:${name} ${D}s infinite both}`;
+const loops = [
+  "jg-arm",
+  "jg-body",
+  "jg-held",
+  "jg-fly",
+  "jg-fx",
+  "jg-fy",
+  "jg-fr",
+  "jg-look",
+  "jg-smile",
+  "jg-open",
+  "jg-o",
+  "jg-sweat",
+  "jg-splat",
+  "jg-shell-l",
+  "jg-shell-r",
+  "jg-new",
+  "jg-nx",
+  "jg-ny",
+  "jg-wide",
+  "jg-crack",
+  "jg-spark",
+  "wt-look",
+  "wt-eyes",
+  "wt-squeeze",
+  "wt-smile",
+  "wt-open",
+  "wt-o",
+  "wt-arm-l",
+  "wt-arm-r",
+  "wt-body",
+];
 const CSS =
   juggler.join("") +
   watcher.join("") +
   motionSafe(
-    [
-      "jg-arm",
-      "jg-arm-l",
-      "jg-body",
-      "jg-held",
-      "jg-fly",
-      "jg-fx",
-      "jg-fy",
-      "jg-fr",
-      "jg-look",
-      "jg-smile",
-      "jg-open",
-      "jg-o",
-      "jg-sweat",
-      "jg-splat",
-      "jg-shell-l",
-      "jg-shell-r",
-      "jg-cap",
-      "jg-new",
-      "jg-nx",
-      "jg-ny",
-      "wt-look",
-      "wt-eyes",
-      "wt-squeeze",
-      "wt-smile",
-      "wt-open",
-      "wt-o",
-      "wt-arm-l",
-      "wt-arm-r",
-      "wt-body",
-    ]
-      .map((name) => anim(name))
-      .join("") +
-      ".scene-hero .jg-wide,.scene-hero .jg-crack,.scene-hero .jg-spark{transform-box:fill-box;transform-origin:50% 50%}" +
-      ".scene-hero .jg-cap{transform-box:fill-box;transform-origin:22% 88%}" +
-      anim("jg-wide") +
-      anim("jg-crack") +
-      anim("jg-spark"),
+    ".scene-hero .jg-wide,.scene-hero .jg-crack,.scene-hero .jg-spark{transform-box:fill-box;transform-origin:50% 50%}" +
+      loops.map((name) => `.scene-hero .${name}{animation:${name} ${D}s infinite both}`).join(""),
   );
-
-const pivot = { transformBox: "view-box", transformOrigin: "0 0" } as const;
 
 export function HeroScene({ className }: { className?: string }) {
   return (
@@ -403,44 +381,44 @@ export function HeroScene({ className }: { className?: string }) {
 
         {/* ——— El Mirón (watcher) ——— */}
         <g transform="translate(14 440) scale(0.64)">
-          <GroundShadow rx={52} />
+          <GroundShadow rx={58} />
           <g className="wt-body" style={pivot}>
             <Legs />
-            <Body id="jg" />
-            <g transform={`translate(${SHOULDER_L[0]} ${SHOULDER_L[1]})`}>
+            <Body />
+            <g transform={`translate(${SL[0]} ${SL[1]})`}>
               <g className="wt-arm-l" style={pivot}>
-                <Limb d="M0 0Q-12 12 -18 26" />
-                <Hand x={-18} y={26} flip />
+                <Arm via={[-9, 12]} to={[-12, 25]} />
               </g>
             </g>
-            <g transform={`translate(${SHOULDER_R[0]} ${SHOULDER_R[1]})`}>
+            <g transform={`translate(${SR[0]} ${SR[1]})`}>
               <g className="wt-arm-r" style={pivot}>
-                <Limb d="M0 0Q12 12 18 26" />
-                <Hand x={18} y={26} />
+                <Arm via={[9, 12]} to={[12, 25]} flip />
               </g>
             </g>
-            <Cheeks />
-            <g className="wt-look" style={pivot}>
-              <g className="wt-eyes">
-                <Eyes blinkClassName="m-blink m-blink-late" />
+            <FaceFrame>
+              <Cheeks />
+              <g className="wt-look" style={pivot}>
+                <g className="wt-eyes">
+                  <Eyes blinkClassName="m-blink m-blink-late" />
+                </g>
               </g>
-            </g>
-            <EyesSqueeze className="wt-squeeze" opacity={0} />
-            <MouthSmile className="wt-smile" />
-            <MouthOpen className="wt-open" opacity={0} />
-            <MouthO className="wt-o" opacity={0} />
-            <Cap id="jg" />
+              <EyesSqueeze className="wt-squeeze" opacity={0} />
+              <MouthSmile className="wt-smile" />
+              <MouthOpen className="wt-open" opacity={0} />
+              <MouthO className="wt-o" opacity={0} />
+            </FaceFrame>
+            <Cap />
           </g>
         </g>
 
         {/* ——— El Malabarista (juggler) ——— */}
         <g transform="translate(166 252) scale(1.38)">
           <GroundShadow />
-          <g className="jg-body" style={{ transformBox: "view-box", transformOrigin: "100px 232px" }}>
+          <g className="jg-body" style={pivotAt(98, FLOOR - 4)}>
             <Legs />
-            <Body id="jg" />
+            <Body />
 
-            {/* fresh egg that pops out from under the cap */}
+            {/* fresh egg that pops out from behind the cap */}
             <g className="jg-new" opacity={0}>
               <g className="jg-nx" style={pivot}>
                 <g className="jg-ny" style={pivot}>
@@ -449,26 +427,23 @@ export function HeroScene({ className }: { className?: string }) {
               </g>
             </g>
 
-            <g transform={`translate(${SHOULDER_L[0]} ${SHOULDER_L[1]})`}>
-              <g className="jg-arm-l" style={pivot}>
-                <Limb d="M0 0Q-14 12 -21 28" />
-                <Hand x={-21} y={28} flip />
-              </g>
-            </g>
+            <ArmHip />
 
-            <Cheeks />
-            <g className="jg-look" style={pivot}>
-              <g className="jg-wide">
-                <Eyes blinkClassName="m-blink" />
+            <FaceFrame>
+              <Cheeks />
+              <g className="jg-look" style={pivot}>
+                <g className="jg-wide">
+                  <Eyes blinkClassName="m-blink" />
+                </g>
               </g>
-            </g>
-            <MouthSmile className="jg-smile" />
-            <MouthOpen className="jg-open" opacity={0} />
-            <MouthO className="jg-o" opacity={0} />
-            <g transform="translate(156 104)">
+              <MouthSmile className="jg-smile" />
+              <MouthOpen className="jg-open" opacity={0} />
+              <MouthO className="jg-o" opacity={0} />
+            </FaceFrame>
+            <g transform="translate(164 100)">
               <SweatDrop className="jg-sweat" opacity={0} />
             </g>
-            <g transform="translate(100 34)">
+            <g transform="translate(96 28)">
               <path
                 className="jg-spark"
                 d="M0 -11L2.6 -2.6L11 0L2.6 2.6L0 11L-2.6 2.6L-11 0L-2.6 -2.6Z"
@@ -479,17 +454,16 @@ export function HeroScene({ className }: { className?: string }) {
                 opacity={0}
               />
             </g>
-            <Cap id="jg" className="jg-cap" />
+            <Cap />
 
-            <g transform={`translate(${SHOULDER_R[0]} ${SHOULDER_R[1]})`}>
+            <g transform={`translate(${SR[0]} ${SR[1]})`}>
               <g className="jg-arm" style={pivot}>
                 <g className="jg-held">
-                  <g transform={`translate(${HELD[0] - SHOULDER_R[0]} ${HELD[1] - SHOULDER_R[1]})`}>
+                  <g transform={`translate(${HELD[0] - SR[0]} ${HELD[1] - SR[1]})`}>
                     <EggProp id="jg" />
                   </g>
                 </g>
-                <Limb d="M0 0Q15 3 29 10" />
-                <Hand x={29} y={10} />
+                <Arm via={[6, 12]} to={[15, 13]} />
               </g>
             </g>
           </g>
@@ -506,7 +480,7 @@ export function HeroScene({ className }: { className?: string }) {
           </g>
 
           {/* ¡crack! */}
-          <g transform={`translate(${IMPACT[0]} 233)`}>
+          <g transform={`translate(${IMPACT[0]} ${FLOOR})`}>
             <g className="jg-splat" opacity={0} style={pivot}>
               <SplatPuddle id="jg" />
               <g className="jg-shell-l" style={pivot}>
@@ -519,8 +493,8 @@ export function HeroScene({ className }: { className?: string }) {
           </g>
           <text
             className="jg-crack"
-            x="236"
-            y="172"
+            x={IMPACT[0] + 4}
+            y="176"
             textAnchor="middle"
             fontSize="30"
             fill="#ee6a0b"
