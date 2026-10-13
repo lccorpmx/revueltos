@@ -1,26 +1,410 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* The site is light-only: keep shadcn's `dark:` classes scoped to a class we never set. */
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-shantell), var(--font-nunito), ui-sans-serif, sans-serif;
+  --font-hand: var(--font-gochi), var(--font-shantell), cursive;
+  --font-heading: var(--font-display);
+
+  /* shadcn semantic tokens */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Brand palette (sampled from the mockup) */
+  --color-sun: var(--sun);
+  --color-sun-deep: var(--sun-deep);
+  --color-yolk: var(--yolk);
+  --color-butter: var(--butter);
+  --color-butter-soft: var(--butter-soft);
+  --color-cream: var(--cream);
+  --color-tangerine: var(--tangerine);
+  --color-orange: var(--orange);
+  --color-orange-ink: var(--orange-ink);
+  --color-orange-deep: var(--orange-deep);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-night: var(--night);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  --ease-squish: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --animate-float: float 4s ease-in-out infinite;
+  --animate-wiggle: wiggle 2.4s ease-in-out infinite;
+  --animate-bob: bob 2.2s ease-in-out infinite;
+  --animate-spin-slow: spin 18s linear infinite;
+  --animate-rise: rise 0.8s var(--ease-out-soft) both;
+  /* Transform-only variants for LCP candidates (never start invisible). */
+  --animate-rise-soft: rise-soft 0.8s var(--ease-out-soft) both;
+  --animate-pop: pop 0.6s var(--ease-squish) both;
+  --animate-pop-soft: pop-soft 0.7s var(--ease-squish) both;
+  --animate-draw: draw 0.9s var(--ease-out-soft) both;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+  @keyframes wiggle {
+    0%,
+    100% {
+      transform: rotate(-4deg);
+    }
+    50% {
+      transform: rotate(4deg);
+    }
+  }
+  @keyframes bob {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0);
+    }
+    50% {
+      transform: translateY(-3px) rotate(-3deg);
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes rise-soft {
+    from {
+      transform: translateY(22px);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes pop-soft {
+    from {
+      transform: scale(0.86) rotate(-4deg);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.6) rotate(-6deg);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+:root {
+  color-scheme: light;
+
+  --sun: #fddf3b;
+  --sun-deep: #f7c31a;
+  --yolk: #ffb31a;
+  --butter: #fdf0cb;
+  --butter-soft: #fef6e6;
+  --cream: #fefaf2;
+  --tangerine: #fda851;
+  --orange: #ee6a0b;
+  /* Darker oranges for text on light backgrounds: large text (≥3:1) and small text (AA). */
+  --orange-deep: #d4570a;
+  --orange-ink: #b04704;
+  --ink: #1b1915;
+  --ink-soft: #3f392f;
+  --night: #1f1f1f;
+
+  --background: var(--cream);
+  --foreground: var(--ink);
+  --card: var(--butter);
+  --card-foreground: var(--ink);
+  --popover: var(--cream);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: #ffffff;
+  --secondary: var(--sun);
+  --secondary-foreground: var(--ink);
+  --muted: var(--butter);
+  --muted-foreground: #5a5144;
+  --accent: var(--sun);
+  --accent-foreground: var(--ink);
+  --destructive: #c62828;
+  --border: #eadbb2;
+  --input: #eadbb2;
+  --ring: var(--orange);
+  --radius: 1rem;
+
+  --header-h: 4.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--header-h);
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground;
+    text-rendering: optimizeLegibility;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 3px solid var(--orange);
+    outline-offset: 3px;
+  }
+  ::selection {
+    background: var(--sun);
+    color: var(--ink);
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-[1240px] px-5 sm:px-8;
+  }
+
+  /* Heavy hand-lettered headings, like the mockup's marker titles. */
+  .display-heavy {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 0.98;
+    -webkit-text-stroke: 0.028em currentColor;
+    paint-order: stroke fill;
+    text-transform: uppercase;
+  }
+}
+
+/* Photo edges with the mockup's hand-cut wave. */
+@utility mask-wave-right {
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0 0H93C97 10 91 20 95 31C99 42 92 53 96 64C100 76 93 86 97 100H0Z'/></svg>");
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+@utility mask-wave-bottom {
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0 0H100V93C88 97 78 90 66 94C54 98 44 91 32 95C20 99 10 92 0 96Z'/></svg>");
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+
+/* Out-of-focus café behind the polaroid mascot. */
+.bokeh-cafe {
+  background:
+    radial-gradient(circle at 16% 18%, rgb(255 214 120 / 0.75) 0 6%, transparent 7%),
+    radial-gradient(circle at 68% 12%, rgb(255 238 190 / 0.6) 0 4.5%, transparent 5.5%),
+    radial-gradient(circle at 88% 34%, rgb(255 196 100 / 0.55) 0 6%, transparent 7%),
+    radial-gradient(circle at 38% 30%, rgb(255 255 255 / 0.3) 0 3.5%, transparent 4.5%),
+    radial-gradient(circle at 8% 52%, rgb(255 205 120 / 0.45) 0 5%, transparent 6%),
+    linear-gradient(90deg, transparent 0 58%, rgb(40 30 22 / 0.35) 58% 62%, transparent 62%),
+    linear-gradient(180deg, #4d3d31 0%, #6d5844 44%, #8f7a63 60%, #c8b8a2 61%, #dacdb9 100%);
+  filter: blur(5px);
+}
+
+/* Scroll reveals (see <Reveal>) and self-drawing marker strokes. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    transition:
+      opacity 0.7s var(--ease-out-soft),
+      translate 0.7s var(--ease-out-soft);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .reveal[data-reveal="out"] {
+    opacity: 0;
+    translate: 0 28px;
+    transition: none;
+  }
+  [data-reveal="out"] .animate-draw {
+    animation: none;
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes logo-wave {
+  0%,
+  100% {
+    rotate: 0deg;
+  }
+  30% {
+    rotate: 24deg;
+  }
+  65% {
+    rotate: -10deg;
+  }
+}
+
+/* Hero sandwich: sauce drizzle + sesame rain, driven by data-phase. */
+.hero-sandwich .hs-fill {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.hero-sandwich:is([data-phase="seeds"], [data-phase="done"]) .hs-fill {
+  opacity: 1;
+}
+.hero-sandwich .hs-drop {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transform: scale(0);
+}
+.hero-sandwich[data-phase="sauce"] .hs-drop {
+  animation: hs-drop 0.34s var(--ease-squish) var(--drop-delay, 0ms) both;
+}
+.hero-sandwich:is([data-phase="seeds"], [data-phase="done"]) .hs-drop {
+  transform: none;
+}
+.hero-sandwich .hs-seed {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+.hero-sandwich[data-phase="seeds"] .hs-seed {
+  animation: hs-seed var(--dur) cubic-bezier(0.5, 0, 0.9, 0.55) var(--delay) both;
+}
+.hero-sandwich[data-phase="seeds"] .hs-seed[data-miss] {
+  animation-name: hs-seed-miss;
+}
+.hero-sandwich[data-phase="done"] .hs-seed {
+  opacity: 1;
+}
+.hero-sandwich[data-phase="done"] .hs-seed[data-miss] {
+  opacity: 0;
+}
+@keyframes hs-drop {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes hs-seed {
+  from {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--spin));
+    opacity: 1;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes hs-seed-miss {
+  from {
+    transform: translate(var(--dx), var(--dy));
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  to {
+    transform: none;
+    opacity: 0;
+  }
+}
+
+/* Scroll builder seeds: one CSS variable (--p) drives ~100 seeds. */
+.builder-seeds {
+  --p: 0;
+}
+.builder-seed {
+  --q: clamp(0, (var(--p) - var(--o)) / 0.62, 1);
+  transform: translate(
+    calc(var(--fx) * (1 - var(--q) * var(--q))),
+    calc(var(--fy) * (1 - var(--q) * var(--q)))
+  );
+}
+.builder-seed[data-miss] {
+  opacity: calc(1 - var(--q));
+}
+
+/* Mascot blinking, shared by every scene. */
+@keyframes m-blink {
+  0%,
+  91%,
+  100% {
+    transform: scaleY(1);
+  }
+  94% {
+    transform: scaleY(0.1);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .m-blink {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: m-blink 4.6s infinite;
+  }
+  .m-blink-late {
+    animation-delay: 1.7s;
+  }
+}
+
+/* Animated scenes pause while they're off-screen (see <AnimatedScene>). */
+[data-paused] *,
+[data-paused] *::before,
+[data-paused] *::after {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
